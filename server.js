@@ -1,63 +1,33 @@
 import express from "express";
-import fs from "fs";
-import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 app.use(express.json());
 
-const DB_FILE = "licenses.json";
+/*
+ENV FORMAT:
 
-/* ===== LOAD DATABASE ===== */
-function loadDB() {
-  if (!fs.existsSync(DB_FILE)) return {};
-  return JSON.parse(fs.readFileSync(DB_FILE));
-}
+LICENSE_KEYS=key1,key2,key3
+*/
 
-function saveDB(data) {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-}
-
-/* ===== CREATE LICENSE ===== */
-app.post("/create", (req, res) => {
-  const db = loadDB();
-
-  const newKey = uuidv4();
-  db[newKey] = {
-    device: null,
-    createdAt: new Date()
-  };
-
-  saveDB(db);
-
-  res.json({ license: newKey });
-});
+const VALID_LICENSES = process.env.LICENSE_KEYS
+  ? process.env.LICENSE_KEYS.split(",")
+  : [];
 
 /* ===== VERIFY LICENSE ===== */
 app.post("/verify", (req, res) => {
-  const { license, device } = req.body;
-  const db = loadDB();
+  const { license } = req.body;
 
-  if (!db[license]) {
-    return res.json({ valid: false, message: "License not found" });
+  if (!license) {
+    return res.json({ valid: false, message: "No license provided" });
   }
 
-  if (!db[license].device) {
-    db[license].device = device;
-    saveDB(db);
-    return res.json({ valid: true, firstBind: true });
+  if (VALID_LICENSES.includes(license)) {
+    return res.json({ valid: true });
   }
 
-  if (db[license].device !== device) {
-    return res.json({
-      valid: false,
-      message: "License already used on another device"
-    });
-  }
-
-  res.json({ valid: true });
+  return res.json({ valid: false, message: "Invalid license" });
 });
 
-/* ===== START SERVER ===== */
 app.listen(3000, () => {
   console.log("License server running on port 3000");
 });
