@@ -1,13 +1,12 @@
 {
-  "name": "license-server",
+  "name": "redeem-bot-license-server",
   "version": "1.0.0",
-  "type": "module",
+  "description": "License validation server for Redeem Bot",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "uuid": "^9.0.1"
+    "express": "^4.18.2"
   }
 }
