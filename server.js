@@ -12,8 +12,20 @@ const LICENSES_FILE = path.join(__dirname, 'licenses.json');
 // Load licenses from file
 function loadLicenses() {
   if (fs.existsSync(LICENSES_FILE)) {
-    const data = fs.readFileSync(LICENSES_FILE, 'utf8');
-    return new Map(JSON.parse(data));
+    try {
+      const data = fs.readFileSync(LICENSES_FILE, 'utf8');
+      const parsed = JSON.parse(data);
+      
+      // Handle both array format (from [...map]) and object format
+      if (Array.isArray(parsed)) {
+        return new Map(parsed);
+      } else if (typeof parsed === 'object' && parsed !== null) {
+        // Convert plain object to Map
+        return new Map(Object.entries(parsed));
+      }
+    } catch (e) {
+      console.error('Error loading licenses:', e.message);
+    }
   }
   return new Map();
 }
