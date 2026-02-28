@@ -26,7 +26,7 @@ function saveLicenses(licenses) {
 let licenses = loadLicenses();
 
 // Admin key from environment variable
-const ADMIN_KEY = process.env.ADMIN_KEY || 'c777c8c2937d908cd5bb7504ad5bcc36ba6372cf69a9818d915026a82dd281cc';
+const ADMIN_KEY = process.env.ADMIN_KEY || 'your-default-admin-key-change-this';
 
 // Generate license keys (admin only)
 app.post('/admin/generate', (req, res) => {
